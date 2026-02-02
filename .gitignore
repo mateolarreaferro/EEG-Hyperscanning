@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+
+# MATLAB data files
+*.mat
+*.fig
+
+# EEG data formats
+*.set
+*.fdt
+*.edf
+*.bdf
+*.vhdr
+*.vmrk
+*.eeg
+*.cnt
+*.mff/
+
+# Brainstorm toolbox (install separately)
+brainstorm-tools-brainstorm3-7b366a3/
+
+# Brainstorm database - raw data (large)
+brainstorm_db/data/
+brainstorm_db/*/data/
+*.raw
+*_raw.mat
+
+# MATLAB temporary files
+*.asv
+*.m~
+*.autosave
+
+# Compiled MEX files
+*.mex*
+
+# Large output files
+*.csv
+*.xlsx
+*.xls
