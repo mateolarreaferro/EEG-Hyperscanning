@@ -24,39 +24,28 @@
 
 pair = {
         'S01', 'S02';
-        'S03', 'S04'; 
-%         'S05', 'S06'; % S05 OUT for Alpha and FRN
-%         'S07', 'S08'; % S07 S08 OUT for Alpha, IN for FRN
-%         'S09', 'S10';
-%         'S11', 'S12'; % S12 OUT for Alpha and FRN
-%         'S13', 'S14';
-%         'S15', 'S16'; % S15 S16 OUT for Alpha and FRN
-%         'S17', 'S18';
-%         'S19', 'S20';
-%         'S21', 'S22'; % S21 S22 OUT for Alpha and FRN
-%         'S23', 'S24';
+        'S03', 'S04';
+        'S09', 'S10';
+        'S13', 'S14';
+        'S17', 'S18';
+        'S19', 'S20';
+        'S23', 'S24';
     };
 npair = size(pair,1);
 
 player = {'SubA';'SubB'};
 
-%first line is first pair, second line is second pair
 melnames = [
-    1,2,3,4;
-    3,4,1,2;
-%     1,2,3,4;
-%     3,4,1,2;
-%     1,2,3,4;
-%     3,4,1,2;
-%     1,2,3,4;
-%     3,4,1,2;
-%     1,2,3,4;
-%     3,4,1,2;
-%     1,2,3,4;
-%     3,4,1,2;
+    1,2,3,4; % pair 1 (S01-S02)
+    3,4,1,2; % pair 2 (S03-S04)
+    1,2,3,4; % pair 5 (S09-S10)
+    1,2,3,4; % pair 7 (S13-S14)
+    1,2,3,4; % pair 9 (S17-S18)
+    3,4,1,2; % pair 10 (S19-S20)
+    3,4,1,2; % pair 12 (S23-S24)
     ];
 
-dirname='C:\Users\tfujioka\Documents\brainstorm_db\Duet2017b\data';
+dirname='/Volumes/MLF/EEG-Hyperscanning/brainstorm_db/Duet2017/data';
 
 
 for ipair=1:npair

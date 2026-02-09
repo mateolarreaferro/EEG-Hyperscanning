@@ -7,8 +7,12 @@ channelfile = "/Volumes/MLF/EEG-Hyperscanning/channel_initial.mat";
 
 % List of subjects to process (must match what you ran in do_0a)
 pair = {
-    'S01', 'S02';
-    'S03', 'S04';
+    'S07', 'S08';
+    'S09', 'S10';
+    'S13', 'S14';
+    'S17', 'S18';
+    'S19', 'S20';
+    'S23', 'S24';
 };
 npair = size(pair,1);
 

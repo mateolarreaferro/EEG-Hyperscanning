@@ -15,38 +15,24 @@
 % universal name
 % list subj#1 subj#2 in the order of the file
 pair = {
-        'S01', 'S02';
-        'S03', 'S04'; 
-%         'S05', 'S06'; % S05 OUT for Alpha and FRN
-%         'S07', 'S08'; % S07 S08 OUT for Alpha, IN for FRN
-%         'S09', 'S10';
-%         'S11', 'S12'; % S12 OUT for Alpha and FRN
-%         'S13', 'S14';
-%         'S15', 'S16'; % S15 S16 OUT for Alpha and FRN
-%         'S17', 'S18';
-%         'S19', 'S20';
-%         'S21', 'S22'; % S21 S22 OUT for Alpha and FRN
-%         'S23', 'S24';
-        };    
+        'S07', 'S08';
+        'S09', 'S10';
+        'S13', 'S14';
+        'S17', 'S18';
+        'S19', 'S20';
+        'S23', 'S24';
+        };
 npair = size(pair,1);
 
 player = {'SubA';'SubB'};
 
-%melnames states the combination of the score for each pair
-% first line is first pair, second line is second pair and so on
 melnames = [
-    1,2,3,4; % pair 1
-    3,4,1,2; % pair 2
-%     1,2,3,4; % pair 3
-%     3,4,1,2; % pair 4
-%     1,2,3,4; % pair 5
-%     3,4,1,2; % pair 6
-%     1,2,3,4; % pair 7
-%     3,4,1,2; % pair 8
-%     1,2,3,4; % pair 9
-%     3,4,1,2; % pair 10
-%     1,2,3,4; % pair 11
-%     3,4,1,2; % pair 12
+    3,4,1,2; % pair 4 (S07-S08)
+    1,2,3,4; % pair 5 (S09-S10)
+    1,2,3,4; % pair 7 (S13-S14)
+    1,2,3,4; % pair 9 (S17-S18)
+    3,4,1,2; % pair 10 (S19-S20)
+    3,4,1,2; % pair 12 (S23-S24)
      ];
 npair = size(pair,1);
 
@@ -90,7 +76,7 @@ sFiles = bst_process('CallProcess', 'process_matlab_eval', sFiles, [], ...
 
 % Save and display report
 ReportFile = bst_report('Save', sFiles);
-bst_report('Open', ReportFile);
+% bst_report('Open', ReportFile);
 % bst_report('Export', ReportFile, ExportDir);
 
     end % isubj

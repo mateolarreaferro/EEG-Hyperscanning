@@ -10,38 +10,24 @@
 % universal name
 % list subj#1 subj#2 in the order of the file
 pair = {
-    'S01', 'S02';
-    'S03', 'S04';
-    %         'S05', 'S06'; % S05 OUT for Alpha and FRN
-    %         'S07', 'S08'; % S07 S08 OUT for Alpha, IN for FRN
-    %         'S09', 'S10';
-    %         'S11', 'S12'; % S12 OUT for Alpha and FRN
-    %         'S13', 'S14';
-    %         'S15', 'S16'; % S15 S16 OUT for Alpha and FRN
-    %         'S17', 'S18';
-    %         'S19', 'S20';
-    %         'S21', 'S22'; % S21 S22 OUT for Alpha and FRN
-    %         'S23', 'S24';
+        'S07', 'S08';
+        'S09', 'S10';
+        'S13', 'S14';
+        'S17', 'S18';
+        'S19', 'S20';
+        'S23', 'S24';
     };
 npair = size(pair,1);
 
 player = {'SubA';'SubB'};
 
-
-%first line is first pair, second line is second pair
 melnames = [
-    1,2,3,4; % pair 1
-    3,4,1,2; % pair 2
-    %     1,2,3,4; % pair 3
-    %     3,4,1,2; % pair 4
-    %     1,2,3,4; % pair 5
-    %     3,4,1,2; % pair 6
-    %     1,2,3,4; % pair 7
-    %     3,4,1,2; % pair 8
-    %     1,2,3,4; % pair 9
-    %     3,4,1,2; % pair 10
-    %     1,2,3,4; % pair 11
-    %     3,4,1,2; % pair 12
+    3,4,1,2; % pair 4 (S07-S08)
+    1,2,3,4; % pair 5 (S09-S10)
+    1,2,3,4; % pair 7 (S13-S14)
+    1,2,3,4; % pair 9 (S17-S18)
+    3,4,1,2; % pair 10 (S19-S20)
+    3,4,1,2; % pair 12 (S23-S24)
     ];
 
 
@@ -60,7 +46,7 @@ for ipair=1:npair
         % List all the raw files for each subject
         % check the exact location of your directory for the brainstorm
         % data (until the 'exist (line 94) is successful
-        dirname = 'C:\Users\tfujioka\Documents\brainstorm_db\Duet2017a\data';
+        dirname = '/Volumes/MLF/EEG-Hyperscanning/brainstorm_db/Duet2017/data';
 % 
 % Path: C:\Users\tfujioka\Documents\brainstorm_db\Duet2017\data
 % Name: S01/@rawS01_AA1_1_Data/data_0raw_S01_AA1_1_Data.mat
@@ -683,7 +669,7 @@ for ipair=1:npair
             % when linux or mac
             %event_filename= (whatever your directory is)
             %event_filename=sprintf('/user/t/takako/MATLAB/Duet/eeg_analysis/Duet2022/EventFiles/events_%s_run%d',subjname, ifile);
-            event_filename=sprintf('C:\\Users\\tfujioka\\Documents\\MATLAB\\451C_W26_practice\\EventFiles\\events_%s_run%d',subjname, ifile);
+            event_filename=sprintf('/Volumes/MLF/EEG-Hyperscanning/EventFiles/events_%s_run%d',subjname, ifile);
 
             save(event_filename, 'events');
             display('file written');

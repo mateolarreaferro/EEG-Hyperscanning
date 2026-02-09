@@ -8,27 +8,17 @@ subj = {
         'S01';
         'S02';
         'S03';
-        'S04'; 
-%         'S05'; % S05 OUT for Alpha and FRN
-%         'S06'; 
-%         'S07'; % S07 S08 OUT for Alpha, IN for FRN
-%         'S08'; % S07 S08 OUT for Alpha, IN for FRN
-%         'S09';
-%         'S10';
-%         'S11';
-%         'S12'; % S12 OUT for Alpha and FRN
-%         'S13';
-%         'S14';
-%         'S15'; % S15 S16 OUT for Alpha and FRN
-%         'S16'; % S15 S16 OUT for Alpha and FRN
-%         'S17';
-%         'S18';
-%         'S19';
-%         'S20';
-%         'S21'; % S21 S22 OUT for Alpha and FRN
-%         'S22'; % S21 S22 OUT for Alpha and FRN
-%         'S23';
-%         'S24';
+        'S04';
+        'S09';
+        'S10';
+        'S13';
+        'S14';
+        'S17';
+        'S18';
+        'S19';
+        'S20';
+        'S23';
+        'S24';
 };
 nsubj = size(subj,1);
 
@@ -44,7 +34,7 @@ cond = {
     };
 ncond = size(cond,1);
 
-dirname =  'C:\Users\tfujioka\Documents\brainstorm_db\Duet2017b\data';
+dirname =  '/Volumes/MLF/EEG-Hyperscanning/brainstorm_db/Duet2017/data';
 
 for isubj= 1:nsubj
     subjname = subj{isubj};
