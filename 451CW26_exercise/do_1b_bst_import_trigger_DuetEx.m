@@ -81,7 +81,7 @@ for ipair=1:npair
             %event_filename=sprintf('/user/t/takako/MATLAB/Duet/eeg_analysis/Duet2022/EventFiles/events_%s_run%d.mat',subjname, ifile);
             
             % PC (it didn't run without .mat)
-            event_filename=sprintf('C:\\Users\\tfujioka\\Documents\\MATLAB\\451C_W26_practice\\EventFiles\\events_%s_run%d.mat',subjname, ifile);
+            event_filename=sprintf('/Volumes/MLF/EEG-Hyperscanning/EventFiles/events_%s_run%d.mat',subjname, ifile);
              
             RawFiles = {...
                 event_filename;

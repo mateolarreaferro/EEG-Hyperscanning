@@ -1,8 +1,22 @@
-% do_bst_epoch_avg_Duet_FRN.m
+% do_bst_epoch_avg_Duet_alphaERD.m
 % 2015 Dec 20 by Takako Fujioka
-% 2016 Mar 6 by Takako Fujioka
-% 2017 Dec 7 by Madeline Huberth for FRN study
-% 2019 Jan 27 brought back by Takako
+% 2016 Mar 7 by Takako Fujioka
+
+
+% 2016 Mar 12 Note by Takako Fujioka
+% The huge amplitude edges appearing after importing epoches
+% from the continuous file were caused by the cnt file when
+% you are converting Curry7 .dat files to .cnt files
+% you forget to chose 'constant' in the Baseline tab
+% inside the Curry7. This is affecting the Brainstorm when it tries to
+% downsample the data while it's importing. 
+% Whether .cnt file is correctly 'constant' baselined is visible if
+% you open the .cnt file from Curry7 main File -> Open menu.
+% If the traces don't look equal distance from each other, it is not adjusted.
+% But this cannot be visible if you open the original .dat file, because
+% Curry7 default to open .dat file is to set the baseline 'Off'.
+% You have to open .cnt files to see the difference. 
+
 % 2026 Jan 27 for 451C W26 Exercise
 
 
@@ -42,12 +56,11 @@ melnames = [
 %     3,4,1,2;
     ];
 
-dirname='C:\Users\tfujioka\Documents\brainstorm_db\Duet2017a\data';
+dirname='C:\Users\tfujioka\Documents\brainstorm_db\Duet2017b\data';
 
-for ipair = 1:npair
-    
-    sub={pair{ipair,1};
-        pair{ipair,2}};
+
+for ipair=1:npair
+    sub={pair{ipair,1};pair{ipair,2}};
     pairname = sprintf('%s_%s', sub{1}, sub{2});
     
     for isubj=1:2
@@ -69,38 +82,38 @@ for ipair = 1:npair
             };
 
         timemax = 1800;
-             
         
-        %         Process: Import MEG/EEG: Events
+        
+        % Process: Import MEG/EEG: Events
         sFiles = bst_process(...
             'CallProcess', 'process_import_data_event', ...
             sFiles, [], ...
             'subjectname', subjname, ...
             'condition', '', ...
-            'eventname', 'DevSelfSameHuman, DevOtherSameHuman, StdSelfSameHuman, StdOtherSameHuman,DevSelfDiffHuman, DevOtherDiffHuman, StdSelfDiffHuman, StdOtherDiffHuman, DevSelfSameComp, DevOtherSameComp, StdSelfSameComp, StdOtherSameComp, DevSelfDiffComp, DevOtherDiffComp, StdSelfDiffComp, StdOtherDiffComp, DevSelfSameHumanFirst, DevOtherSameHumanFirst, StdSelfSameHumanFirst, StdOtherSameHumanFirst,DevSelfDiffHumanFirst, DevOtherDiffHumanFirst, StdSelfDiffHumanFirst, StdOtherDiffHumanFirst, DevSelfSameCompFirst, DevOtherSameCompFirst, StdSelfSameCompFirst, StdOtherSameCompFirst, DevSelfDiffCompFirst, DevOtherDiffCompFirst, StdSelfDiffCompFirst, StdOtherDiffCompFirst, DevSelfSameHumanSecond, DevOtherSameHumanSecond, StdSelfSameHumanSecond, StdOtherSameHumanSecond,DevSelfDiffHumanSecond, DevOtherDiffHumanSecond, StdSelfDiffHumanSecond, StdOtherDiffHumanSecond, DevSelfSameCompSecond, DevOtherSameCompSecond, StdSelfSameCompSecond, StdOtherSameCompSecond, DevSelfDiffCompSecond, DevOtherDiffCompSecond, StdSelfDiffCompSecond, StdOtherDiffCompSecond', ...
+            'eventname', 'LeaderSameHuman, LeaderDiffHuman, FollowerSameHuman, FollowerDiffHuman, LeaderSameComp, LeaderDiffComp, FollowerSameComp, FollowerDiffComp' , ...
             'timewindow', [0, timemax], ...
-            'epochtime', [-0.5 1.0], ...
+            'epochtime', [-1.5, 3.0], ...
             'createcond', 1, ...
             'ignoreshort', 1, ...
-            'usectfcomp', 1, ...
-            'usessp', 0, ...
-            'freq', [], ...
+            'usectfcomp', 0, ...
+            'usessp', 1, ...
+            'freq', 125, ... % downsampling from 500Hz to 125Hz
             'baseline', []);
+           % 'eventname', 'LeaderSameHuman, LeaderDiffHuman, FollowerSameHuman, FollowerDiffHuman, LeaderSameComp, LeaderDiffComp, FollowerSameComp, FollowerDiffComp' , ...
         
-        % Note that ssp is turned off because we already run it at the
-        % first place
         
-        % Process: Detect bad channels: Peak-to-peak  EEG(-250-250)
+        % Process: Detect bad channels: Peak-to-peak  EEG(-350-350)
         sFiles = bst_process(...
             'CallProcess', 'process_detectbad', ...
             sFiles, [], ...
-            'timewindow', [-0.2, 0.6], ...
+            'timewindow', [-1.0, 3.0], ...
             'meggrad', [0, 0], ...
             'megmag', [0, 0], ...
             'eeg', [-250, 250], ...
             'eog', [0, 0], ...
             'ecg', [0, 0], ...
             'rejectmode',  1);  % Reject only the bad channels
+        %'rejectmode', 2);  % Reject trials
         
         % Process: Average: By condition (subject average)
         sFiles = bst_process(...
@@ -110,30 +123,17 @@ for ipair = 1:npair
             'avg_func', 1, ...  % <HTML>Arithmetic average: <FONT color="#777777">mean(x)</FONT>
             'keepevents', 0);
         
-        % Process: Add time offset: -21.00ms for new arduino, -20 ms for old
-        % arduino
-        sFiles = bst_process('CallProcess', 'process_timeoffset', ...
+        % Process: Remove DC offset: [-100ms,0ms]
+        sFiles = bst_process(...
+            'CallProcess', 'process_baseline', ...
             sFiles, [], ...
-            'offset', -0.021, ...
-            'overwrite', 0);
-        
-        
-        % Process: DC offset correction: [-50ms,0ms]
-        sFiles = bst_process('CallProcess', 'process_baseline', sFiles, [], ...
-            'baseline',    [-0.05, 0], ...
+            'baseline', [-0.10, 0.00], ...
             'sensortypes', 'EEG', ...
-            'method',      'bl', ...  % DC offset correction:    x_std = x - &mu;
-            'overwrite',   1);
+            'overwrite', 1);
+                
         
-        
-    end % isubj
+     end % isubj
 end %ipair
 
-%% you can now make individual ERPs and look at topographies.
-% Also you can make grandaverages and difference waveforms in Brainstorm to
-% assess what is happening.
 
-%% Note that, however, now, you don't need Brainstorm anymore.
-% First, export all datasets and save the workspace.
-% After that, use that workspace to keep post-processing (filter, combine
-% electrode group, plotting, and stats).
+% after this 

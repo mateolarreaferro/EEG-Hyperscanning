@@ -42,7 +42,7 @@ melnames = [
 %     3,4,1,2;
     ];
 
-dirname='C:\Users\tfujioka\Documents\brainstorm_db\Duet2017a\data';
+dirname='/Volumes/MLF/EEG-Hyperscanning/brainstorm_db/Duet2017/data';
 
 for ipair = 1:npair
     

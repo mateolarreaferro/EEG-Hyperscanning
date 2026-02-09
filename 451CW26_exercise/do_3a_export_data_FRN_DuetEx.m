@@ -7,7 +7,7 @@
 % modified on 3/11/2016 by Madeline for Motif_Piano_Duet study
 % brought back by Takako 2019 Jan 27 for 451C exercise.
 
-dirname =  'C:\Users\tfujioka\Documents\brainstorm_db\Duet2017a\data';
+dirname =  '/Volumes/MLF/EEG-Hyperscanning/brainstorm_db/Duet2017/data';
 
 subjname_all = {
     'S01';
@@ -87,8 +87,8 @@ end
 % make the time vector for later use
 time = tmp.Time;
 
-mydirectory =  'C:\Users\tfujioka\Documents\MATLAB/451C_W26_practice';
+mydirectory =  '/Volumes/MLF/EEG-Hyperscanning/output';
 
-mydate = '20260127';
+mydate = '20260208';
 savefilename=sprintf('%s/FRN_DuetEx_%s.mat',mydirectory,mydate); %FRN_DuetEx_20260127.mat'
-save(savefilename);
+save(savefilename, 'dat_all', 'time', 'stim_name', 'subjname_all', 'nsubj', 'nstim', 'nchan', 'ntime');

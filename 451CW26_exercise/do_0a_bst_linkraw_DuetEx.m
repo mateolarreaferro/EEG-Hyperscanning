@@ -16,7 +16,7 @@
 
 % this is where you store downloaded .cnt files (you have to change it
 % yourself)
-mydirname = "C:\Users\tfujioka\Documents\MATLAB\451C_W26_practice\raw\Piano_Duet2017";
+mydirname = "/Volumes/MLF/EEG-Hyperscanning/Piano_Duet2017";
 
 % universal name
 

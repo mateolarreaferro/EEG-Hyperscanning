@@ -7,9 +7,9 @@
 % 2024 03 10 DuetDistance pair 1 
 % 2026 01 27 DuetEx(Duet2017 FRN data)
 
-mydirectory = 'C:\\Users\\tfujioka\\Documents\\MATLAB\\451C_W26_practice';
+mydirectory = '/Volumes/MLF/EEG-Hyperscanning/output';
 
-load(sprintf('%s/FRN_DuetEx_20260127.mat',mydirectory));
+load(sprintf('%s/FRN_DuetEx_20260208.mat',mydirectory));
 
 dat_all_org=dat_all;
 nchan=size(dat_all,3);
@@ -49,14 +49,14 @@ cond_list ={
     
 ncond = size(cond_list,1);
 
-%% check the data
-for istim=1:nstim
-    figure;
-    plot(time, squeeze(mean(dat_all_org(:,istim,1:64,:))));
-    title(sprintf('Stim-%s',stim_name{istim}));
-end
-%%
-close all
+% %% check the data
+% for istim=1:nstim
+%     figure;
+%     plot(time, squeeze(mean(dat_all_org(:,istim,1:64,:))));
+%     title(sprintf('Stim-%s',stim_name{istim}));
+% end
+% %%
+% close all
 
 %% extend dat_all to have stndard both self and other so that we can make pair of standard and deviant
 
@@ -87,16 +87,16 @@ end
 
 dat_all = dat_all_ext2;
 
-%% check the data (do you see FRN as a difference between standard and deviant lines?)
-for isubj=1:nsubj
-    figure;
-    plot(time, squeeze(dat_all_ext2(isubj,1,1,1,1,28,:))); % 28 is Cz
-    hold on;
-    plot(time, squeeze(dat_all_ext2(isubj,1,1,1,2,28,:)));
-    title(sprintf('Subj-%s',subjname_all{isubj}));
-end
-%% 
-close all
+% %% check the data (do you see FRN as a difference between standard and deviant lines?)
+% for isubj=1:nsubj
+%     figure;
+%     plot(time, squeeze(dat_all_ext2(isubj,1,1,1,1,28,:))); % 28 is Cz
+%     hold on;
+%     plot(time, squeeze(dat_all_ext2(isubj,1,1,1,2,28,:)));
+%     title(sprintf('Subj-%s',subjname_all{isubj}));
+% end
+% %%
+% close all
 
 %% filtering and setting up baseline on complete data
 
@@ -186,19 +186,19 @@ for isubj=1:nsubj
     end
 end
 
-%% check the data (check filtering, and making difference waveform)
-for isubj=1:nsubj
-    figure;
-    plot(time, squeeze(dat_all_nf(isubj,1,1,1,1,28,:)));
-    hold on;
-    plot(time, squeeze(dat_all_f2(isubj,1,1,1,1,28,:)));
-    plot(time, squeeze(dat_all_f2(isubj,1,1,1,2,28,:)));
-    plot(time,  squeeze(diff_all_f2(isubj,1,1,1,28,:)));
-    
-    title(sprintf('Subj-%s',subjname_all{isubj}));
-end
-%% 
-close all
+% %% check the data (check filtering, and making difference waveform)
+% for isubj=1:nsubj
+%     figure;
+%     plot(time, squeeze(dat_all_nf(isubj,1,1,1,1,28,:)));
+%     hold on;
+%     plot(time, squeeze(dat_all_f2(isubj,1,1,1,1,28,:)));
+%     plot(time, squeeze(dat_all_f2(isubj,1,1,1,2,28,:)));
+%     plot(time,  squeeze(diff_all_f2(isubj,1,1,1,28,:)));
+%
+%     title(sprintf('Subj-%s',subjname_all{isubj}));
+% end
+% %%
+% close all
 
 %% make electrode groups 
 
@@ -303,21 +303,21 @@ for isubj=1:nsubj
 end
 
 
-%% check the data (see std,dev,diff waveforms)
-for isubj=1:nsubj
-    figure;
-    for ielec=1:nelec
-        subplot(1,2,ielec)
-        hold on
-        plot(time, squeeze(dat_elec_f2(isubj,1,1,1,1,ielec,:)));
-        plot(time, squeeze(dat_elec_f2(isubj,1,1,1,2,ielec,:)));
-        plot(time,  squeeze(diff_elec_f2(isubj,1,1,1,ielec,:)));
-    
-        title(sprintf('Subj-%s-%s',subjname_all{isubj},elec_list{ielec}));
-    end
-end
-%% 
-close all
+% %% check the data (see std,dev,diff waveforms)
+% for isubj=1:nsubj
+%     figure;
+%     for ielec=1:nelec
+%         subplot(1,2,ielec)
+%         hold on
+%         plot(time, squeeze(dat_elec_f2(isubj,1,1,1,1,ielec,:)));
+%         plot(time, squeeze(dat_elec_f2(isubj,1,1,1,2,ielec,:)));
+%         plot(time,  squeeze(diff_elec_f2(isubj,1,1,1,ielec,:)));
+%
+%         title(sprintf('Subj-%s-%s',subjname_all{isubj},elec_list{ielec}));
+%     end
+% end
+% %%
+% close all
 
 %% make grand average and SE
 
@@ -335,23 +335,23 @@ diff_elec_f2_SE=squeeze(std(diff_elec_f2(ssubj,:,:,:,:,:),1))/sqrt(length(ssubj)
 diff_elec_f2_USE=diff_elec_f2_GA+diff_elec_f2_SE;
 diff_elec_f2_LSE=diff_elec_f2_GA-diff_elec_f2_SE;
 
-%% check the data (check gavg should be in the middle of upper SE and lower SE)
-imelody=1;
-iagency=1;
-
-for ipartner=1:npartner
-    figure;
-    for ielec=1:nelec
-        subplot(1,2,ielec);
-        plot(time, squeeze(diff_elec_f2_GA(ipartner, imelody, iagency,ielec,:)),'LineWidth',3);
-        hold on;
-        plot(time, [squeeze(diff_elec_f2_USE(ipartner, imelody, iagency,ielec,:)),squeeze(diff_elec_f2_LSE(ipartner, imelody, iagency,ielec,:))],'LineWidth',1);
-    
-        title(sprintf('Partner-%s-%s',partner{ipartner}, elec_list{ielec}));
-    end
-end
-%% 
-close all
+% %% check the data (check gavg should be in the middle of upper SE and lower SE)
+% imelody=1;
+% iagency=1;
+%
+% for ipartner=1:npartner
+%     figure;
+%     for ielec=1:nelec
+%         subplot(1,2,ielec);
+%         plot(time, squeeze(diff_elec_f2_GA(ipartner, imelody, iagency,ielec,:)),'LineWidth',3);
+%         hold on;
+%         plot(time, [squeeze(diff_elec_f2_USE(ipartner, imelody, iagency,ielec,:)),squeeze(diff_elec_f2_LSE(ipartner, imelody, iagency,ielec,:))],'LineWidth',1);
+%
+%         title(sprintf('Partner-%s-%s',partner{ipartner}, elec_list{ielec}));
+%     end
+% end
+% %%
+% close all
 
 %% t-test for each time point
 
@@ -371,7 +371,7 @@ for ipartner = 1:npartner
                 dat1=squeeze(dat_elec_f2(ssubj,ipartner, imelody, iagency,1,ielec,:));% Standard
                 dat2=squeeze(dat_elec_f2(ssubj,ipartner, imelody, iagency,2,ielec,:));% Deviant
                 for itime=cutoff:ntime
-                    [h, p]=ttest(dat1(:,itime),dat2(:,itime)); % paired t-test
+                    [h, p]=my_ttest(dat1(:,itime),dat2(:,itime)); % paired t-test
 
                     h_all(ipartner, imelody, iagency, ielec,itime)=h;
                     p_all(ipartner, imelody, iagency, ielec,itime)=p;
@@ -387,77 +387,61 @@ end
 st.SvD_h_all = h_all;
 st.SvD_p_all = p_all;
 
-%% check the data (h_all)
-for ielec=1:2 % ielec=1 -> FRN and P3a, ielec=2 -> P3b   
-    figure;
-    isubplot=1;
-    for ipartner=1:2
-        for imelody=1:2
-            subplot(2,2,isubplot)
-            plot(time, squeeze(h_all(ipartner, imelody, 1, ielec,:)));
-            hold on;
-            plot(time, squeeze(h_all(ipartner, imelody, 2, ielec,:)));
-            legend('Self','Other');
-            title(sprintf('%s:%s:%s',elec_list{ielec},partner{ipartner},melody{imelody}));
-            isubplot=isubplot + 1;
-        end
-    end
-end
-
-%%
-close all
-%% plotting Standard and Deviant with ttest dots
-
-ielec=1;
-figure;
-isubplot=1;
-
-k=-3.5; % adjust the location of the dots if necessary
-for ipartner=1:2
-    for imelody=1:2
-        for iagency=1:2
-
-            subplot(2,4,isubplot);
-            elec_char=elec_list{ielec}; % name of current region we're plotting
-            partner_char=partner{ipartner};
-            melody_char=melody{imelody};
-            agency_char=agency{iagency};
-
-            % plotting these data in one figure
-            dat_erp = squeeze(dat_elec_f2_GA(ipartner, imelody, iagency,1:2,ielec,:));
-            dat_diff = squeeze(diff_elec_f2_GA(ipartner, imelody, iagency,ielec,:));
-
-            h_dat = squeeze(st.SvD_h_all(ipartner, imelody, iagency,ielec,:));
-
-            % plot lines
-            plot(time, dat_erp);
-            hold on;grid on;
-            plot(time, dat_diff,'--');
-
-            % only significant dot appears
-            plot(-0.2,1,'ro'); % dummy
-            indx=find(h_dat(it02+1:ntime)); % after time zero
-            plot(time(indx+it02), k*h_dat(indx+it02),'ro');
-
-            % axis range
-            axis([-0.1 0.5 -6 6]) % adjust if needed
-
-            % title and legend
-            title(sprintf('%s-%s-%s-%s', partner_char, melody_char, agency_char, elec_char));
-            xlabel('Time (S)'); ylabel('Voltage (micro-V)');
-            if isubplot==8
-                legend('Std','Dev','Diff','SvsD');
-            end
-            % increment the subplot position
-            isubplot=isubplot + 1;
-        end
-    end
-end
-
-% write the figure into a file
-print(sprintf('fig_ERP_diff_%s', elec_char), '-dpng')
-%% 
-close all
+% %% check the data (h_all)
+% for ielec=1:2 % ielec=1 -> FRN and P3a, ielec=2 -> P3b
+%     figure;
+%     isubplot=1;
+%     for ipartner=1:2
+%         for imelody=1:2
+%             subplot(2,2,isubplot)
+%             plot(time, squeeze(h_all(ipartner, imelody, 1, ielec,:)));
+%             hold on;
+%             plot(time, squeeze(h_all(ipartner, imelody, 2, ielec,:)));
+%             legend('Self','Other');
+%             title(sprintf('%s:%s:%s',elec_list{ielec},partner{ipartner},melody{imelody}));
+%             isubplot=isubplot + 1;
+%         end
+%     end
+% end
+%
+% %%
+% close all
+% %% plotting Standard and Deviant with ttest dots
+% (commented out for batch run - uncomment to inspect plots)
+% ielec=1;
+% figure;
+% isubplot=1;
+% k=-3.5;
+% for ipartner=1:2
+%     for imelody=1:2
+%         for iagency=1:2
+%             subplot(2,4,isubplot);
+%             elec_char=elec_list{ielec};
+%             partner_char=partner{ipartner};
+%             melody_char=melody{imelody};
+%             agency_char=agency{iagency};
+%             dat_erp = squeeze(dat_elec_f2_GA(ipartner, imelody, iagency,1:2,ielec,:));
+%             dat_diff = squeeze(diff_elec_f2_GA(ipartner, imelody, iagency,ielec,:));
+%             h_dat = squeeze(st.SvD_h_all(ipartner, imelody, iagency,ielec,:));
+%             plot(time, dat_erp);
+%             hold on;grid on;
+%             plot(time, dat_diff,'--');
+%             plot(-0.2,1,'ro');
+%             indx=find(h_dat(it02+1:ntime));
+%             plot(time(indx+it02), k*h_dat(indx+it02),'ro');
+%             axis([-0.1 0.5 -6 6])
+%             title(sprintf('%s-%s-%s-%s', partner_char, melody_char, agency_char, elec_char));
+%             xlabel('Time (S)'); ylabel('Voltage (micro-V)');
+%             if isubplot==8
+%                 legend('Std','Dev','Diff','SvsD');
+%             end
+%             isubplot=isubplot + 1;
+%         end
+%     end
+% end
+% print(sprintf('fig_ERP_diff_%s', elec_char), '-dpng')
+% %%
+% close all
 
 
 
@@ -479,7 +463,7 @@ for imelody=1:nmelody
 
             for itime=cutoff:ntime
 
-                [h, p]=ttest(dat1(:,itime),dat2(:,itime)); % paired t-test
+                [h, p]=my_ttest(dat1(:,itime),dat2(:,itime)); % paired t-test
                 h_all(imelody,iagency, ielec,itime)=h;
                 p_all(imelody, iagency,ielec,itime)=p;
                 if h
@@ -493,50 +477,10 @@ end
 st.HMvCP_h_all = h_all;
 st.HMvCP_p_all = p_all;
 
-%% plotting Human vs. Computer with ttest dots
-ielec=1;
-k=-3.5; % adjust the location of the dots if necessary
-figure;
-isubplot=1;
-for imelody=1:2
-    for iagency=1:2
-
-        subplot(2,2,isubplot);
-
-        elec_char=elec_list{ielec}; % name of current region we're plotting
-
-        melody_char=melody{imelody};
-        agency_char=agency{iagency};
-        % plotting these data in one figure
-        dat_diff1 = squeeze(diff_elec_f2_GA(1,imelody,iagency,ielec,:));
-        dat_diff2 = squeeze(diff_elec_f2_GA(2,imelody,iagency,ielec,:));
-        h_dat = squeeze(st.HMvCP_h_all(imelody,iagency,ielec,:));
-
-        % plot lines
-        plot(time, dat_diff1);
-        hold on;grid on;
-        plot(time, dat_diff2)
-
-        % only significant dot appears
-        plot(-0.2,1,'ro'); % dummy
-        indx=find(h_dat(it02+1:ntime)); % after time zero
-        plot(time(indx+it02), k*h_dat(indx+it02),'ro');
-
-        % axis range
-        axis([-0.1 0.5 -6 6]) % adjust if needed
-
-        % title and legend
-        title(sprintf('%s-%s-%s', melody_char, agency_char, elec_char));
-        xlabel('Time (S)'); ylabel('Voltage (micro-V)');
-        
-        if isubplot==4
-            legend('HM','CP','HMvsCP');
-        end
-        isubplot=isubplot+1;
-    end
-end
-%% 
-close all
+% %% plotting Human vs. Computer with ttest dots
+% (commented out for batch run)
+% %%
+% close all
 
 %% t-test: comparing diff between melody per partner and agency 
 % I don't compare now the agency because always self should be larger than
@@ -556,7 +500,7 @@ for ipartner = 1:npartner
 
             for itime=cutoff:ntime
 
-                [h, p]=ttest(dat1(:,itime),dat2(:,itime)); % paired t-test
+                [h, p]=my_ttest(dat1(:,itime),dat2(:,itime)); % paired t-test
                 h_all(ipartner,iagency, ielec,itime)=h;
                 p_all(ipartner, iagency,ielec,itime)=p;
                 if h
@@ -570,51 +514,14 @@ end
 st.SMvDF_h_all = h_all;
 st.SMvDF_p_all = p_all;
 
-%% plotting Same vs. Diff with ttest dots
-ielec=1;
-k=-3.5; % adjust the location of the dots if necessary
-figure;
-isubplot=1;
-for ipartner=1:2
-    for iagency=1:2
+% %% plotting Same vs. Diff with ttest dots
+% (commented out for batch run)
+% %%
+% close all
 
-        subplot(2,2,isubplot);
-
-        elec_char=elec_list{ielec}; % name of current region we're plotting
-
-        partner_char=partner{ipartner};
-        agency_char=agency{iagency};
-        % plotting these data in one figure
-        dat_diff1 = squeeze(diff_elec_f2_GA(ipartner,1,iagency,ielec,:));
-        dat_diff2 = squeeze(diff_elec_f2_GA(ipartner,2,iagency,ielec,:));
-        h_dat = squeeze(st.SMvDF_h_all(ipartner,iagency,ielec,:));
-
-        % plot lines
-        plot(time, dat_diff1);
-        hold on;grid on;
-        plot(time, dat_diff2)
-
-        % only significant dot appears
-        plot(-0.2,1,'ro'); % dummy
-        indx=find(h_dat(it02+1:ntime)); % after time zero
-        plot(time(indx+it02), k*h_dat(indx+it02),'ro');
-
-        % axis range
-        axis([-0.1 0.5 -6 6]) % adjust if needed
-
-        % title and legend
-        title(sprintf('%s-%s-%s', partner_char, agency_char, elec_char));
-        xlabel('Time (S)'); ylabel('Voltage (micro-V)');
-        
-        if isubplot==4
-            legend('SM','DF','SMvsDF');
-        end
-        isubplot=isubplot+1;
-    end
-end
-
-%% 
-close all
+fprintf('\n=== Processing complete up to peak identification ===\n');
+fprintf('All t-tests done. Now run the sections below (619+) line by line in the Editor.\n');
+return;
 
 %% determine the peak latency area for amplitude calculation
 
@@ -700,7 +607,7 @@ itw_P3a=it_beforeP3a_half:it_afterP3a_half;
 
 
 %% making amplitude values for time windows of interest, and write out for R
-mydate='20260127';
+mydate='20260208';
 filename = sprintf('FRN_P3a_amp_%s.txt',mydate);
 fid = fopen(filename,'w');
 fprintf(fid, 'subjID\t partner\t melody\t agency\t elec\t FRN\t P3a\n');
