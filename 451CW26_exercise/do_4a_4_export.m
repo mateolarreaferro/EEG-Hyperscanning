@@ -10,7 +10,7 @@ ielec=1;
 filename = sprintf('%s/FRN_P3a_amp_%s.txt', outdir, mydate);
 fid = fopen(filename,'w');
 fprintf(fid, 'subjID\t partner\t melody\t agency\t elec\t FRN\t P3a\n');
-for isubj=1:nsubj
+for isubj=ssubj
     for ipartner=1:npartner
         for imelody=1:nmelody
             for iagency = 1:nagency

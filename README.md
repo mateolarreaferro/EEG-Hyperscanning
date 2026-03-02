@@ -47,8 +47,12 @@ EEG hyperscanning analysis pipeline for a Piano Duet study (Music 451C W26, Feb 
 │   ├── AlphaERD_DuetEx_20260208.mat
 │   ├── Workspace_FRN_DuetEx_20260208.mat
 │   ├── Workspace_AlphaERD_DuetEx_20260208.mat
-│   ├── FRN_P3a_amp_20260208.txt       # For R stats
-│   └── AlphaERD_DuetEx_20260208.txt   # For R stats
+│   ├── FRN_P3a_amp_20260208.txt       # For R/Python stats
+│   ├── AlphaERD_DuetEx_20260208.txt   # For R stats
+│   ├── QQ_FRN_residuals.png           # ANOVA residual normality check
+│   └── FRN_interaction_plot.png       # 3-way interaction plot
+├── anova_FRN_DuetEx.py       # Python 3-way RM-ANOVA for FRN
+├── anova_FRN_DuetEx.R        # Original R script (reference)
 ├── instructions.docx         # Original pipeline instructions
 └── download_scripts.sh       # SCP from CCRMA server
 ```
@@ -172,7 +176,24 @@ Changed search pattern from `timefreq_morlet_*_ersd_timeoffset.mat` to `timefreq
 2. Run: 0a -> 0a2 -> 0b -> 1a -> 1b -> 1c -> 1d
 3. FRN track: 2a -> 3a (update subject list) -> 4a_1 -> 4a_2 -> 4a_3 -> 4a_4
 4. Alpha track: 2b -> 3b -> 3c (update subject list) -> 4b
-5. R stats using exported .txt files
+5. Stats using exported .txt files (R or Python — see below)
+
+## Statistical Analysis (Python)
+
+`anova_FRN_DuetEx.py` replicates the R script (`anova_FRN_DuetEx.R`) without requiring R/RStudio.
+
+**Requirements:** Python 3 with numpy, pandas, scipy, matplotlib
+
+**Run:** `python3 anova_FRN_DuetEx.py`
+
+**What it does:**
+- Loads `output/FRN_P3a_amp_20260208.txt` and filters to 5 clean pairs (10 subjects: S01-S04, S09-S10, S17-S20)
+- 3-way within-subjects RM-ANOVA on FRN: partner(Human/Comp) × agency(Self/Other) × melody(Same/Diff)
+- Manual SS decomposition (all 15 terms verified to sum to SS_total)
+- Generalized eta-squared per Olejnik & Algina (2003)
+- Post-hoc paired contrasts matching R's `emmeans` output format
+- Residual Q-Q plot → `output/QQ_FRN_residuals.png`
+- 3-way interaction plot with Cousineau-Morey within-subject error bars → `output/FRN_interaction_plot.png`
 
 ## CCRMA Server
 Scripts source: `mlarreaf@ccrma-gate.stanford.edu:/user/t/takako/MATLAB/Duet/eeg_analysis/451CW26_exercise/`

@@ -252,7 +252,7 @@ close all
 % ssubj is 'selected subjects'
 % So make your list of subjects without people you want to exclude
 % ex) ssubj = [1 3 5 6]; % when excluding 2 and 4
-ssubj=1:nsubj;
+ssubj=[1:6, 8:13]; % excluding S13 (idx 7) - extreme outlier, S24 (idx 14) - severe eye artifacts
 
 nssubj=length(ssubj);
 
@@ -263,7 +263,7 @@ for icond = 1:ncond
     figure;
     % plot conditions by subj
 
-    for issubj = 1:nssubj
+    for issubj = ssubj
         hold on
         p2 = plot(time, squeeze(dat_all(issubj,icond,28,:)));
         % adjust the y-range here if needed
@@ -386,8 +386,8 @@ for idtype=1:2
         cond2 = contrast(icontrast,2);
 
         for ielec=1:nelec
-            dat1=squeeze(dat_elec_nf(short_subj_list,cond1, ielec,:));
-            dat2=squeeze(dat_elec_nf(short_subj_list,cond2, ielec,:));
+            dat1=squeeze(dat_elec_nf(:,cond1, ielec,:));
+            dat2=squeeze(dat_elec_nf(:,cond2, ielec,:));
             for itime=1:ntime
                 [h_elec(idtype,icontrast,ielec,itime),p_elec(idtype,icontrast,ielec,itime)]=my_ttest(dat1(:,itime),dat2(:,itime));
             end
@@ -671,7 +671,7 @@ fid = fopen(filename,'w');
 
 % first line
 fprintf(fid,'Subj\tRole\tMelody\tPartner\tElec\tAlphaERD\n');
-for isubj=1:nsubj
+for isubj=ssubj
     for icond=1:ncond
         for ielec=1:nelec
             curr_subj = subj{isubj};
@@ -718,8 +718,8 @@ fclose(fid)
 % Alpha  use Xe1
 
 % leader or follower
-X1 = Xe1(:, cond_leader,:);
-X2 = Xe1(:, cond_follower,:);
+X1 = Xe1(ssubj, cond_leader,:);
+X2 = Xe1(ssubj, cond_follower,:);
 
 % prepare indices
 mel_index = [];
@@ -733,7 +733,7 @@ icond=1;
 for ipart=1:2
     for imel = 1:2
         for ielec = 1:nelec
-            for isubj = 1:nsubj
+            for isubj = 1:nssubj
                 mel_index = [mel_index;imel];
                 part_index = [part_index;ipart];
                 elec_index = [elec_index;ielec];
@@ -869,7 +869,7 @@ for ipartner=1:2
     for imelody=1:2
         % adjust according to how saturated the color is, but use the same color bar for one target ERP component
         Alpha_minmax = [-40 40];
-        xdat= squeeze(mean(mean(dat_all_leader(ssubj,icond,1:64,itw),1),4));
+        xdat= squeeze(mean(mean(dat_all_leader(:,icond,1:64,itw),1),4));
         figure;
         rri_topoplot(xdat,{'maplimits',Alpha_minmax}) % [min max] in micro volt (because the data are already in micro volt)
         % color bar title
@@ -893,7 +893,7 @@ for ipartner=1:2
     for imelody=1:2
         % adjust according to how saturated the color is, but use the same color bar for one target ERP component
         Alpha_minmax = [-40 40];
-        xdat= squeeze(mean(mean(dat_all_follower(ssubj,icond,1:64,itw),1),4));
+        xdat= squeeze(mean(mean(dat_all_follower(:,icond,1:64,itw),1),4));
         figure;
         rri_topoplot(xdat,{'maplimits',Alpha_minmax}) % [min max] in micro volt (because the data are already in micro volt)
         % color bar title

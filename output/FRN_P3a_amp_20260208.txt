@@ -119,11 +119,3 @@ S23	 Comp	 Same	 Self	 fc6	 -2.759	1.986
 S23	 Comp	 Same	 Other	 fc6	 -0.890	0.861
 S23	 Comp	 Diff	 Self	 fc6	 -3.018	1.468
 S23	 Comp	 Diff	 Other	 fc6	 -2.141	-0.134
-S24	 Human	 Same	 Self	 fc6	 -2.126	1.745
-S24	 Human	 Same	 Other	 fc6	 -1.941	0.894
-S24	 Human	 Diff	 Self	 fc6	 -2.469	1.198
-S24	 Human	 Diff	 Other	 fc6	 -0.710	0.234
-S24	 Comp	 Same	 Self	 fc6	 -0.412	0.448
-S24	 Comp	 Same	 Other	 fc6	 -2.381	0.334
-S24	 Comp	 Diff	 Self	 fc6	 -0.380	1.180
-S24	 Comp	 Diff	 Other	 fc6	 -1.896	1.358

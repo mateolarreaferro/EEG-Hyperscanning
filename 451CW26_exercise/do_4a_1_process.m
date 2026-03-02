@@ -208,7 +208,7 @@ for isubj=1:nsubj
 end
 
 %% Grand average and SE
-ssubj=1:nsubj;
+ssubj=1:15; % excluding S24 (idx 16) - severe eye artifacts
 
 dat_elec_f2_GA=squeeze(mean(dat_elec_f2(ssubj,:,:,:,:,:,:),1));
 dat_elec_f2_SE=squeeze(std(dat_elec_f2(ssubj,:,:,:,:,:,:),1))/sqrt(length(ssubj));
