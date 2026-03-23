@@ -19,6 +19,7 @@
 pair = {
     'UV', 'ML';
     'LJ', 'TF';
+    'CM', 'MG';
     };
 npair = size(pair,1);
 player = {'SubA';'SubB'};

@@ -21,6 +21,7 @@
 pair = {
     'UV', 'ML';
     'LJ', 'TF';
+    'CM', 'MG';
     };
 npair = size(pair,1);
 

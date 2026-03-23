@@ -13,7 +13,8 @@
 % list subj#1 subj#2 in the order of the file
 pair = {
         'UV', 'ML';
-        'LJ', 'TF'; 
+        'LJ', 'TF';
+        'CM', 'MG';
         };    
 npair = size(pair,1);
 
@@ -295,7 +296,7 @@ for ipair=1:npair
 
             % (3) even my
             time_dev = time_dev_even_my;
-            time_std = t_odd_std_all;
+            time_std = t_even_std_all;
             t_std_beforeDev = [];            
             % find the note before for each dev
             ndev = length(time_dev);
@@ -311,7 +312,7 @@ for ipair=1:npair
             time_std_even_my = t_std_beforeDev;
             % (4) even pt
             time_dev = time_dev_even_pt;
-            time_std = t_odd_std_all;
+            time_std = t_even_std_all;
             t_std_beforeDev = [];            
             % find the note before for each dev
             ndev = length(time_dev);

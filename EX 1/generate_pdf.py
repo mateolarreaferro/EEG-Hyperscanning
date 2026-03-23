@@ -83,6 +83,73 @@ def md_to_rt(text):
     return text
 
 
+def crop_whitespace(img_path):
+    """Crop whitespace from a topomap image, return path to cropped version."""
+    pil_img = PILImage.open(img_path).convert("RGBA")
+    # Create a white background reference
+    bg = PILImage.new("RGBA", pil_img.size, (255, 255, 255, 255))
+    diff = PILImage.new("L", pil_img.size)
+    for x in range(pil_img.size[0]):
+        for y in range(pil_img.size[1]):
+            r1, g1, b1, a1 = pil_img.getpixel((x, y))
+            r2, g2, b2, a2 = bg.getpixel((x, y))
+            d = abs(r1 - r2) + abs(g1 - g2) + abs(b1 - b2)
+            diff.putpixel((x, y), min(255, d))
+    bbox = diff.getbbox()
+    if bbox:
+        # Add small padding
+        pad = 5
+        bbox = (max(0, bbox[0] - pad), max(0, bbox[1] - pad),
+                min(pil_img.size[0], bbox[2] + pad), min(pil_img.size[1], bbox[3] + pad))
+        cropped = pil_img.crop(bbox)
+        cropped_path = img_path.replace('.png', '_cropped.png')
+        cropped.save(cropped_path)
+        return cropped_path
+    return img_path
+
+
+def auto_crop(img_path):
+    """Crop uniform background from topomap images using corner color detection."""
+    import numpy as np
+    pil_img = PILImage.open(img_path).convert("RGB")
+    arr = np.array(pil_img)
+    h, w = arr.shape[:2]
+    # Sample corner regions to determine background color
+    corners = np.concatenate([
+        arr[:10, :10].reshape(-1, 3),
+        arr[:10, -10:].reshape(-1, 3),
+        arr[-10:, :10].reshape(-1, 3),
+        arr[-10:, -10:].reshape(-1, 3),
+    ])
+    bg_color = np.median(corners, axis=0).astype(np.uint8)
+    # Pixels that differ from background by more than threshold
+    diff = np.abs(arr.astype(int) - bg_color.astype(int)).sum(axis=2)
+    mask = diff > 30
+    rows = np.any(mask, axis=1)
+    cols = np.any(mask, axis=0)
+    if rows.any() and cols.any():
+        rmin, rmax = np.where(rows)[0][[0, -1]]
+        cmin, cmax = np.where(cols)[0][[0, -1]]
+        pad = 10
+        rmin = max(0, rmin - pad)
+        rmax = min(h, rmax + pad)
+        cmin = max(0, cmin - pad)
+        cmax = min(w, cmax + pad)
+        cropped = pil_img.crop((cmin, rmin, cmax, rmax))
+        # Convert to white background
+        bg = PILImage.new("RGB", cropped.size, (255, 255, 255))
+        cropped_arr = np.array(cropped)
+        bg_arr = np.array(bg)
+        crop_diff = np.abs(cropped_arr.astype(int) - bg_color.astype(int)).sum(axis=2)
+        bg_mask = crop_diff <= 30
+        cropped_arr[bg_mask] = [255, 255, 255]
+        result = PILImage.fromarray(cropped_arr)
+        cropped_path = img_path.replace('.png', '_cropped.png')
+        result.save(cropped_path)
+        return cropped_path
+    return img_path
+
+
 def add_image(story, img_path, max_w=None, max_h=None):
     """Add an image scaled to fit."""
     if max_w is None:
@@ -107,33 +174,35 @@ def add_image(story, img_path, max_w=None, max_h=None):
 
 
 def add_topo_grid(story, paths, labels, max_per_row=4):
-    """Add a grid of topomap images with labels."""
+    """Add a grid of topomap images with labels, auto-cropping whitespace."""
     valid = [(p, l) for p, l in zip(paths, labels) if os.path.exists(p)]
     if not valid:
         story.append(Paragraph("[Topomap images not found]", styles['Body']))
         return
 
     cell_w = usable_w / max_per_row
-    cell_h = 1.8 * inch
-    img_h = 1.5 * inch
+    img_h = 2.8 * inch
 
     rows_data = []
     label_row = []
     img_row = []
     for i, (p, l) in enumerate(valid):
-        label_row.append(Paragraph(f"<b>{l}</b>", ParagraphStyle('tc', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER)))
+        label_row.append(Paragraph(f"<b>{l}</b>", ParagraphStyle('tc', parent=styles['Normal'], fontSize=9, alignment=TA_CENTER)))
         try:
-            pil_img = PILImage.open(p)
+            cropped_path = auto_crop(p)
+            pil_img = PILImage.open(cropped_path)
             iw, ih = pil_img.size
             aspect = iw / ih
-            w = min(cell_w - 10, img_h * aspect)
+            w = min(cell_w - 6, img_h * aspect)
             h = w / aspect
-            img_row.append(Image(p, width=w, height=h))
+            if h > img_h:
+                h = img_h
+                w = h * aspect
+            img_row.append(Image(cropped_path, width=w, height=h))
         except:
             img_row.append(Paragraph("?", styles['Body']))
 
         if len(img_row) == max_per_row or i == len(valid) - 1:
-            # Pad if needed
             while len(label_row) < max_per_row:
                 label_row.append("")
                 img_row.append("")
@@ -157,9 +226,12 @@ def add_topo_grid(story, paths, labels, max_per_row=4):
 story = []
 
 # Title
-story.append(Paragraph("Music 451C Exercise Report — W26 (2026/02/24)", styles['Title2']))
+story.append(Paragraph("Music 451C Exercise Report - W26 (2026/02/24)", styles['Title2']))
 story.append(Paragraph("Piano Duet 2017 EEG Hyperscanning Study", styles['Subtitle']))
-story.append(HRFlowable(width="100%", thickness=1, color=colors.grey))
+story.append(Paragraph("Mateo Larrea / Stanford University", ParagraphStyle(
+    'Author', parent=styles['Normal'], fontSize=12, alignment=TA_CENTER,
+    fontName='Times-Roman', spaceAfter=12
+)))
 story.append(Spacer(1, 12))
 
 # Read markdown and parse
@@ -168,17 +240,17 @@ lines = md_text.split('\n')
 
 i = 0
 in_references = False
+pending_caption = None  # holds a figure caption to keep with next image
 while i < len(lines):
     line = lines[i].strip()
 
     # Skip title lines (already added)
-    if line.startswith('# Music 451C') or line == '**Piano Duet 2017 EEG Hyperscanning Study**':
+    if line.startswith('# Music 451C') or line == '**Piano Duet 2017 EEG Hyperscanning Study**' or line == 'Mateo Larrea / Stanford University':
         i += 1
         continue
 
-    # Horizontal rule
+    # Horizontal rule (skip)
     if line == '---':
-        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey, spaceBefore=12, spaceAfter=12))
         in_references = False
         i += 1
         continue
@@ -217,38 +289,89 @@ while i < len(lines):
                 i += 1
             else:
                 break
-        # Single image: full width
+        # Build image elements
+        img_elements = []
         if len(img_paths) == 1:
-            add_image(story, img_paths[0])
+            # Single image: full width — build element list for KeepTogether
+            img_path = img_paths[0]
+            if os.path.exists(img_path):
+                try:
+                    pil_img = PILImage.open(img_path)
+                    iw, ih = pil_img.size
+                    aspect = iw / ih
+                    max_w, max_h = usable_w, 3.5 * inch
+                    w = min(max_w, max_h * aspect)
+                    h = w / aspect
+                    if h > max_h:
+                        h = max_h
+                        w = h * aspect
+                    img_elements.append(Image(img_path, width=w, height=h))
+                except:
+                    pass
         else:
             # Multiple consecutive images: arrange in 2x2 grid
-            # Extract short labels from the alt text
             short_labels = []
             for lbl in img_labels:
                 lbl = lbl.replace('Alpha Topomap - ', '').replace('FRN Topomap - ', '')
                 short_labels.append(lbl if lbl else '')
-            add_topo_grid(story, img_paths, short_labels, max_per_row=2)
+            # Build grid table directly
+            grid_elements = []
+            _story_tmp = []
+            add_topo_grid(_story_tmp, img_paths, short_labels, max_per_row=2)
+            img_elements.extend(_story_tmp)
+
+        if pending_caption and img_elements:
+            story.append(KeepTogether(img_elements + [pending_caption]))
+            pending_caption = None
+        else:
+            story.extend(img_elements)
+            if pending_caption:
+                story.append(pending_caption)
+                pending_caption = None
         continue
 
-    # Table with images (topomap grids)
-    if line.startswith('|') and '!' in line:
-        # Parse the table: header row, separator, image row
-        header_line = line
-        labels = [c.strip() for c in header_line.split('|')[1:-1]]
-        i += 1  # skip separator
-        if i < len(lines) and lines[i].strip().startswith('|'):
-            i += 1  # skip alignment row
-        if i < len(lines) and lines[i].strip().startswith('|'):
-            img_line = lines[i].strip()
-            img_matches = re.findall(r'!\[.*?\]\((.+?)\)', img_line)
-            if img_matches:
-                add_topo_grid(story, img_matches, labels)
-            i += 1
-        continue
+    # Table rows — collect consecutive image tables (possibly separated by blank lines)
+    if line.startswith('|'):
+        all_table_lines = []
+        # Collect this table and any following tables separated by blank lines
+        while True:
+            while i < len(lines) and lines[i].strip().startswith('|'):
+                all_table_lines.append(lines[i].strip())
+                i += 1
+            # Look ahead past blank lines for another table
+            j = i
+            while j < len(lines) and lines[j].strip() == '':
+                j += 1
+            if j < len(lines) and lines[j].strip().startswith('|') and '!' in ''.join(lines[j2].strip() for j2 in range(j, min(j+5, len(lines))) if lines[j2].strip().startswith('|')):
+                # Skip blank lines and continue collecting
+                i = j
+            else:
+                break
 
-    # Regular table (skip header-only tables)
-    if line.startswith('|') and '!' not in line:
-        i += 1
+        # Check if any line contains images
+        has_images = any('!' in tl for tl in all_table_lines)
+        if has_images:
+            all_header_labels = []
+            all_img_paths = []
+            for tl in all_table_lines:
+                if '!' in tl:
+                    img_matches = re.findall(r'!\[.*?\]\((.+?)\)', tl)
+                    all_img_paths.extend(img_matches)
+                elif ':---' not in tl and tl.count('|') > 2:
+                    labels = [c.strip() for c in tl.split('|')[1:-1]]
+                    all_header_labels.extend(labels)
+            if all_img_paths:
+                if not all_header_labels or len(all_header_labels) != len(all_img_paths):
+                    all_header_labels = [os.path.splitext(os.path.basename(p))[0] for p in all_img_paths]
+                grid_elements = []
+                add_topo_grid(grid_elements, all_img_paths, all_header_labels)
+                if pending_caption and grid_elements:
+                    story.extend(grid_elements)
+                    story.append(pending_caption)
+                    pending_caption = None
+                else:
+                    story.extend(grid_elements)
+        # else: skip non-image tables
         continue
 
     # Empty line
@@ -269,15 +392,20 @@ while i < len(lines):
         text = ' '.join(para_lines)
         text = md_to_rt(text)
 
-        # Figure caption
+        # Figure caption — defer to keep with next image
         if text.startswith('<b>Figure'):
-            story.append(Paragraph(text, styles['FigCaption']))
+            if pending_caption:
+                story.append(pending_caption)
+            pending_caption = Paragraph(text, styles['FigCaption'])
         elif in_references:
             story.append(Paragraph(text, styles['Ref']))
         else:
             story.append(Paragraph(text, styles['Body']))
     else:
         i += 1
+
+if pending_caption:
+    story.append(pending_caption)
 
 doc.build(story)
 print(f"PDF generated: {output_path}")

@@ -23,7 +23,8 @@ mydirname = '/Volumes/MLF/EEG-Hyperscanning/EX 2/EEG_raw';
 % list subj#1 subj#2 in the order of the file
 pair = {
         'UV', 'ML';
-        'LJ', 'TF'; 
+        'LJ', 'TF';
+        'CM', 'MG';
         };    
 npair = size(pair,1);
 
